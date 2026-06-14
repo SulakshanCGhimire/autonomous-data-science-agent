@@ -43,3 +43,23 @@ class DatasetLoader:
         
         logger.info(f"Dataset loaded {self.data.shape[0]} rows successfully from {path}")
         return self.data
+    
+    def get_metadata(self):
+        """Return metadata about the loaded dataset."""
+        
+        if self.data is None:
+            logger.warning("No dataset loaded. Metadata is unavailable.")
+            raise ValueError("No dataset loaded. Metadata is unavailable.")
+        
+        
+        metadata = {
+            "row_count": self.data.shape[0],
+            "column_count": self.data.shape[1],
+            "column_names": self.data.columns.tolist(),
+            "file_path": self.filepath,
+            "data_types": self.data.dtypes.astype(str).to_dict()
+        }
+        
+        logger.info(f"Metadata retrieved for dataset: {metadata}")
+        
+        return metadata
