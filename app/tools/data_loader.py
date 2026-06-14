@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from app.core import logger
 
 class DatasetLoader:
     def __init__(self):
@@ -10,7 +11,9 @@ class DatasetLoader:
     def validate_file(self, path):
         """Validate the file path and format."""
         if not os.path.isfile(path):
+            logger.error(f"The file {path} does not exist.")
             raise FileNotFoundError(f"The file {path} does not exist.")
+        
         """ 
             Robust form would have been to check file signature by using this code:
             with open(path, 'rb') as f:
@@ -19,15 +22,24 @@ class DatasetLoader:
                 raise ValueError("The file is not a valid ZIP archive.") 
             We used the extension check for simplicity, but in production, we should implement a more robust validation method.
         """
+        
         path_ext = os.path.splitext(path)[1].lower()
         if path_ext != '.csv':
+            logger.error(f"Unsupported file format: {path_ext}. Only CSV files are allowed.")
             raise ValueError(f"Unsupported file format: {path_ext}. Only CSV files are allowed.")
         return True
 
     def load(self, path):
         """Load a CSV file into the data attribute."""
+        
+        # In a production environment, we would implement more robust validation and error handling here, such as checking for file size limits, validating the content of the CSV, and handling potential exceptions during loading.
+        logger.info(f"Attempting to load dataset from {path}")
+        """Load a CSV file into the data attribute."""
         self.filepath = path
+        
+        # Validate the file before loading
         self.validate_file(self.filepath)
-        # We will add our robust validation steps here shortly
         self.data = pd.read_csv(self.filepath)
+        
+        logger.info(f"Dataset loaded {self.data.shape[0]} rows successfully from {path}")
         return self.data
